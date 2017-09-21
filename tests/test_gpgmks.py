@@ -249,7 +249,10 @@ class TestSignAndEncrypt:
 
     def test_sign_and_encrypt(self):
         keydata = open(self.sender_key, "rb").read()
-        keys = get_usable_secret_keys(homedir=self.sender_homedir)
+        # for some reason pgpy does not like the stray data before
+        # https://github.com/SecurityInnovation/PGPy/issues/218
+        keydata = keydata[keydata.index('-----'):]
+        keys = get_usable_keys(homedir=self.sender_homedir)
         assert_equals(1, len(keys))
         key = keys[0]
         uids = key.uidslist
@@ -312,5 +315,5 @@ class TestMultipleUID(TestSignAndEncrypt):
     RECEIVER_KEY = "seckey-2.asc"
 
 class TestUtf8(TestSignAndEncrypt):
-    SENDER_KEY = "seckey-utf8.asc"
-    RECEIVER_KEY = "pubkey-utf8.asc"
+    SENDER_KEY = "pubkey-utf8.asc"
+    RECEIVER_KEY = "seckey-utf8.asc"
